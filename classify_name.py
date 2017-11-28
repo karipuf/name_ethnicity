@@ -22,16 +22,18 @@ savePath='currentModel_'+str(nUnits)+'units_'+str(lr)+'lr'
 savePath='bestSoFar'
 
 # Extracting features
-fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl']
+neths=['Asian,GreaterEastAsian,EastAsian','Asian,GreaterEastAsian,Japanese','Asian,IndianSubContinent','GreaterAfrican,Africans','GreaterAfrican,Muslim','GreaterEuropean,British','GreaterEuropean,EastEuropean','GreaterEuropean,Jewish','GreaterEuropean,WestEuropean,French','GreaterEuropean,WestEuropean,Germanic','GreaterEuropean,WestEuropean,Hispanic','GreaterEuropean,WestEuropean,Italian','GreaterEuropean,WestEuropean,Nordic']
 
-names=[]
-eths=[]
-for fname in fnames:
-    d=pickle.load(open(fname,"rb"))
-    for tmp in d.items():
-       eths.append(','.join([tmp2['best'] for tmp2 in tmp[1]]))
+#fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl']
 
-le=LabelEncoder().fit(eths)
+#names=[]
+#eths=[]
+#for fname in fnames:
+#    d=pickle.load(open(fname,"rb"))
+#    for tmp in d.items():
+#       eths.append(','.join([tmp2['best'] for tmp2 in tmp[1]]))
+
+le=LabelEncoder().fit(neths)
 
 try:
     sess.close()

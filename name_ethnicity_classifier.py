@@ -14,18 +14,18 @@ def ToInt(instr,maxLen=15):
         
 
 # Initializations
-nUnits=600
+nUnits=800
 nEthnicities=13
 lr=.005
-nIters=16000
+nIters=20000
 nDisp=250
-savePath='currentModel_'+str(nUnits)+'units_'+str(lr)+'lr'
+savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr'
 existingModel=False
 minibatch=128
 valProp=.1
 
 # Extracting features
-fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl']
+fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl','PolSciEth.pkl']
 
 names=[]
 eths=[]
@@ -47,14 +47,16 @@ y=tf.placeholder(tf.int32,shape=(None,))
 yoh=tf.one_hot(y,nEthnicities,dtype=tf.float32)
 
 cell=tf.contrib.rnn.BasicLSTMCell(nUnits)
-cell_bw=tf.contrib.rnn.BasicLSTMCell(nUnits)
+#cell_bw=tf.contrib.rnn.BasicLSTMCell(nUnits)
 
 rnn=tf.nn.dynamic_rnn(cell,xoh,dtype=tf.float32)
 #rnn=tf.nn.bidirectional_dynamic_rnn(cell,cell_bw,xoh,dtype=tf.float32)
 
 wout=tf.Variable(tf.truncated_normal((nUnits,nEthnicities),stddev=.001))
-#wout=tf.Variable(tf.truncated_normal((nUnits*2,nEthnicities),stddev=.001))
 bout=tf.Variable(tf.zeros((nEthnicities)))
+
+#wout=tf.Variable(tf.truncated_normal((nUnits*2,nEthnicities),stddev=.001))
+
 
 logitsTraining=tf.add(tf.nn.dropout(tf.matmul(rnn[1].h,wout),0.6),bout)
 logits=tf.add(tf.matmul(rnn[1].h,wout),bout)
@@ -91,6 +93,7 @@ trainInds=np.logical_not(valInds)
 xnumTrain=xnum[trainInds];ynumTrain=ynum[trainInds]
 xnumVal=xnum[valInds];ynumVal=ynum[valInds]
 
+curMin=0.9
 for count in range(nIters):
 
     randInds=np.random.choice(range(len(ynumTrain)),minibatch,replace=False)
@@ -102,8 +105,17 @@ for count in range(nIters):
         else:
             sess.run(opt3,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
     if count % nDisp==0:
-        print(savePath+", Iteration# "+str(count)+", validation error is: "+str(sess.run(loss,feed_dict={x:xnumVal,y:ynumVal})))
+        err=sess.run(loss,feed_dict={x:xnumVal,y:ynumVal})
+        print(savePath+", Iteration# "+str(count)+", validation error is: "+str(err))
+        if err<curMin:
+            print("New low error! Caching the model")
+
+            curMin=err
+            saver=tf.train.Saver()
+            saver.save(sess,"currentBest_"+savePath);
         sys.stdout.flush()
+
+        
 
 saver=tf.train.Saver()
 saver.save(sess,savePath);
