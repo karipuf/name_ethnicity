@@ -1,5 +1,5 @@
 import tensorflow as tf
-import pickle,re
+import pickle,re,sys
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder,OneHotEncoder
@@ -14,19 +14,18 @@ def ToInt(instr,maxLen=15):
         
 
 # Initializations
-nUnits=100
+nUnits=600
 nEthnicities=13
-lr=.001
-nIters=30000
-nDisp=10
-#savePath='currentModel'
-savePath='currentModelBidirectional'
+lr=.005
+nIters=16000
+nDisp=250
+savePath='currentModel_'+str(nUnits)+'units_'+str(lr)+'lr'
 existingModel=False
 minibatch=128
 valProp=.1
 
 # Extracting features
-fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl']
+fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl']
 
 names=[]
 eths=[]
@@ -57,7 +56,7 @@ wout=tf.Variable(tf.truncated_normal((nUnits,nEthnicities),stddev=.001))
 #wout=tf.Variable(tf.truncated_normal((nUnits*2,nEthnicities),stddev=.001))
 bout=tf.Variable(tf.zeros((nEthnicities)))
 
-logitsTraining=tf.add(tf.nn.dropout(tf.matmul(rnn[1].h,wout),0.5),bout)
+logitsTraining=tf.add(tf.nn.dropout(tf.matmul(rnn[1].h,wout),0.6),bout)
 logits=tf.add(tf.matmul(rnn[1].h,wout),bout)
 #logits=tf.add(tf.matmul(tf.concat([tmp.h for tmp in rnn[1]],axis=1),wout),bout)
 yhat=tf.nn.softmax(logits)
@@ -99,7 +98,8 @@ for count in range(nIters):
     else:
         sess.run(opt2,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
     if count % nDisp==0:
-        print("Iteration# "+str(count)+", validation error is: "+str(sess.run(loss,feed_dict={x:xnumVal,y:ynumVal})))
+        print(savePath+", Iteration# "+str(count)+", validation error is: "+str(sess.run(loss,feed_dict={x:xnumVal,y:ynumVal})))
+        sys.stdout.flush()
 
 saver=tf.train.Saver()
 saver.save(sess,savePath);
