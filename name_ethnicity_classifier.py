@@ -19,12 +19,14 @@ nEthnicities=13
 lr=.001
 nIters=30000
 nDisp=10
-savePath='incTrainModel'
+#savePath='currentModel'
+savePath='currentModelBidirectional'
 existingModel=False
 minibatch=128
+valProp=.1
 
 # Extracting features
-fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl']
+fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl']
 
 names=[]
 eths=[]
@@ -46,17 +48,24 @@ y=tf.placeholder(tf.int32,shape=(None,))
 yoh=tf.one_hot(y,nEthnicities,dtype=tf.float32)
 
 cell=tf.contrib.rnn.BasicLSTMCell(nUnits)
+cell_bw=tf.contrib.rnn.BasicLSTMCell(nUnits)
+
 rnn=tf.nn.dynamic_rnn(cell,xoh,dtype=tf.float32)
+#rnn=tf.nn.bidirectional_dynamic_rnn(cell,cell_bw,xoh,dtype=tf.float32)
 
 wout=tf.Variable(tf.truncated_normal((nUnits,nEthnicities),stddev=.001))
+#wout=tf.Variable(tf.truncated_normal((nUnits*2,nEthnicities),stddev=.001))
 bout=tf.Variable(tf.zeros((nEthnicities)))
 
-logits=tf.add(tf.matmul(rnn[1][1],wout),bout)
+logitsTraining=tf.add(tf.nn.dropout(tf.matmul(rnn[1].h,wout),0.5),bout)
+logits=tf.add(tf.matmul(rnn[1].h,wout),bout)
+#logits=tf.add(tf.matmul(tf.concat([tmp.h for tmp in rnn[1]],axis=1),wout),bout)
 yhat=tf.nn.softmax(logits)
 
+lossTraining=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logitsTraining,labels=yoh))
 loss=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=yoh))
-opt=tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
-opt2=tf.train.AdamOptimizer(learning_rate=lr/2).minimize(loss)
+opt=tf.train.AdamOptimizer(learning_rate=lr).minimize(lossTraining)
+opt2=tf.train.AdamOptimizer(learning_rate=lr/2).minimize(lossTraining)
 
 try:
     sess.close()
@@ -75,16 +84,22 @@ if existingModel:
 
 sess.run(tf.global_variables_initializer())
 
+# Setting aside validation set
+valInds=np.random.rand(len(ynum))<valProp
+trainInds=np.logical_not(valInds)
+
+xnumTrain=xnum[trainInds];ynumTrain=ynum[trainInds]
+xnumVal=xnum[valInds];ynumVal=ynum[valInds]
+
 for count in range(nIters):
 
-    randInds=np.random.choice(range(len(ynum)),minibatch,replace=False)
+    randInds=np.random.choice(range(len(ynumTrain)),minibatch,replace=False)
     if count<(nIters/2):
-        sess.run(opt,feed_dict={x:xnum[randInds],y:ynum[randInds]})
+        sess.run(opt,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
     else:
-        sess.run(opt2,feed_dict={x:xnum[randInds],y:ynum[randInds]})
+        sess.run(opt2,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
     if count % nDisp==0:
-        randInds=np.random.choice(range(len(ynum)),minibatch,replace=False)
-        print("Iteration# "+str(count)+", Error is: "+str(sess.run(loss,feed_dict={x:xnum[randInds],y:ynum[randInds]})))
+        print("Iteration# "+str(count)+", validation error is: "+str(sess.run(loss,feed_dict={x:xnumVal,y:ynumVal})))
 
 saver=tf.train.Saver()
 saver.save(sess,savePath);
