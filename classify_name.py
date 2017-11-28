@@ -15,14 +15,11 @@ def ToInt(instr,maxLen=15):
 
 # Initializations
 nUnits=600
-nEthnicities=13
 lr=.005
-nIters=18000
-nDisp=250
+
 savePath='currentModel_'+str(nUnits)+'units_'+str(lr)+'lr'
-existingModel=False
-minibatch=128
-valProp=.1
+#savePath='currentModel_300units_100hidden_0.005lr'
+savePath='bestSoFar'
 
 # Extracting features
 fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl']

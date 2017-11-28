@@ -15,11 +15,12 @@ def ToInt(instr,maxLen=15):
 
 # Initializations
 nUnits=600
+nHidden=250
 nEthnicities=13
 lr=.005
-nIters=16000
+nIters=20000
 nDisp=250
-savePath='currentModel_'+str(nUnits)+'units_'+str(lr)+'lr'
+savePath='currentModel_'+str(nUnits)+'units_'+str(nHidden)+'hidden_'+str(lr)+'lr'
 existingModel=False
 minibatch=128
 valProp=.1
@@ -52,19 +53,29 @@ cell_bw=tf.contrib.rnn.BasicLSTMCell(nUnits)
 rnn=tf.nn.dynamic_rnn(cell,xoh,dtype=tf.float32)
 #rnn=tf.nn.bidirectional_dynamic_rnn(cell,cell_bw,xoh,dtype=tf.float32)
 
-wout=tf.Variable(tf.truncated_normal((nUnits,nEthnicities),stddev=.001))
+w1=tf.Variable(tf.truncated_normal((nUnits,nHidden),stddev=.001))
+b1=tf.Variable(tf.zeros((nHidden)))
+a1=tf.nn.relu(tf.add(tf.matmul(rnn[1].h,w1),b1))
+
+wout=tf.Variable(tf.truncated_normal((nHidden,nEthnicities),stddev=.001))
+#wout=tf.Variable(tf.truncated_normal((nUnits,nEthnicities),stddev=.001))
 #wout=tf.Variable(tf.truncated_normal((nUnits*2,nEthnicities),stddev=.001))
 bout=tf.Variable(tf.zeros((nEthnicities)))
 
-logitsTraining=tf.add(tf.nn.dropout(tf.matmul(rnn[1].h,wout),0.6),bout)
-logits=tf.add(tf.matmul(rnn[1].h,wout),bout)
+logitsTraining=tf.add(tf.nn.dropout(tf.matmul(tf.nn.dropout(a1,0.6),wout),0.6),bout)
+logits=tf.add(tf.matmul(a1,wout),bout)
+#logitsTraining=tf.add(tf.nn.dropout(tf.matmul(rnn[1].h,wout),0.6),bout)
+#logits=tf.add(tf.matmul(rnn[1].h,wout),bout)
+
 #logits=tf.add(tf.matmul(tf.concat([tmp.h for tmp in rnn[1]],axis=1),wout),bout)
+
 yhat=tf.nn.softmax(logits)
 
 lossTraining=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logitsTraining,labels=yoh))
 loss=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=yoh))
 opt=tf.train.AdamOptimizer(learning_rate=lr).minimize(lossTraining)
 opt2=tf.train.AdamOptimizer(learning_rate=lr/2).minimize(lossTraining)
+opt3=tf.train.AdamOptimizer(learning_rate=lr/4).minimize(lossTraining)
 
 try:
     sess.close()
@@ -96,7 +107,10 @@ for count in range(nIters):
     if count<(nIters/2):
         sess.run(opt,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
     else:
-        sess.run(opt2,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
+        if count<(nIters*0.75):
+            sess.run(opt2,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
+        else:
+            sess.run(opt3,feed_dict={x:xnumTrain[randInds],y:ynumTrain[randInds]})
     if count % nDisp==0:
         print(savePath+", Iteration# "+str(count)+", validation error is: "+str(sess.run(loss,feed_dict={x:xnumVal,y:ynumVal})))
         sys.stdout.flush()

@@ -8,7 +8,7 @@ for item in testSet.items():
     vec.append((item[0],','.join([tmp['best'] for tmp in item[1]])))
 
 # The number of items to test (since it can take a while)
-nTest=2500
+nTest=3500
 
 ypred=np.array([ClassifyName(tmp[0]) for tmp in vec[:nTest]])
 ylab=np.array([tmp[1] for tmp in vec[:nTest]])
