@@ -14,24 +14,11 @@ def ToInt(instr,maxLen=15):
         
 
 # Initializations
-nUnits=600
-lr=.005
-
-savePath='currentModel_'+str(nUnits)+'units_'+str(lr)+'lr'
-#savePath='currentModel_300units_100hidden_0.005lr'
-savePath='bestSoFar'
+savePath='currentModel_600units_0.005lr'
+#savePath='currentBest_model_800units_0.005lr'
 
 # Extracting features
 neths=['Asian,GreaterEastAsian,EastAsian','Asian,GreaterEastAsian,Japanese','Asian,IndianSubContinent','GreaterAfrican,Africans','GreaterAfrican,Muslim','GreaterEuropean,British','GreaterEuropean,EastEuropean','GreaterEuropean,Jewish','GreaterEuropean,WestEuropean,French','GreaterEuropean,WestEuropean,Germanic','GreaterEuropean,WestEuropean,Hispanic','GreaterEuropean,WestEuropean,Italian','GreaterEuropean,WestEuropean,Nordic']
-
-#fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl']
-
-#names=[]
-#eths=[]
-#for fname in fnames:
-#    d=pickle.load(open(fname,"rb"))
-#    for tmp in d.items():
-#       eths.append(','.join([tmp2['best'] for tmp2 in tmp[1]]))
 
 le=LabelEncoder().fit(neths)
 
@@ -57,3 +44,7 @@ yhat=sess.graph.get_tensor_by_name('Softmax:0')
 #sess.run(tf.global_variables_initializer())
 def ClassifyName(inname):
     return le.inverse_transform(np.argmax(sess.run(yhat,feed_dict={x:[ToInt(inname)]})))
+
+def ClassifyNames(innames):
+    namevecs=[ToInt(tmp) for tmp in innames]
+    return le.inverse_transform(np.argmax(sess.run(yhat,feed_dict={x:namevecs}),axis=1))

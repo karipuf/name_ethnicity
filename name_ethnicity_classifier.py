@@ -14,7 +14,7 @@ def ToInt(instr,maxLen=15):
         
 
 # Initializations
-nUnits=800
+nUnits=1200
 nEthnicities=13
 lr=.005
 nIters=20000
@@ -25,7 +25,7 @@ minibatch=128
 valProp=.1
 
 # Extracting features
-fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl','PolSciEth.pkl']
+fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl','PolSciEth.pkl','PhilosophyEth.pkl']
 
 names=[]
 eths=[]
