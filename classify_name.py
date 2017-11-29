@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder,OneHotEncoder
 
 # Utility functions
-def ToInt(instr,maxLen=15):
+def ToInt(instr,maxLen=20):
     basevec=[ord(tmp.lower())-96 for tmp in  re.sub('\s','`',instr)]
     if len(instr)>=maxLen:
         return basevec[:maxLen]
@@ -14,8 +14,11 @@ def ToInt(instr,maxLen=15):
         
 
 # Initializations
+nameLen=20
+
 savePath='currentModel_600units_0.005lr'
 #savePath='currentBest_model_800units_0.005lr'
+savePath='currentBest_model_800units_0.005lr_20maxNameLen'
 
 # Extracting features
 neths=['Asian,GreaterEastAsian,EastAsian','Asian,GreaterEastAsian,Japanese','Asian,IndianSubContinent','GreaterAfrican,Africans','GreaterAfrican,Muslim','GreaterEuropean,British','GreaterEuropean,EastEuropean','GreaterEuropean,Jewish','GreaterEuropean,WestEuropean,French','GreaterEuropean,WestEuropean,Germanic','GreaterEuropean,WestEuropean,Hispanic','GreaterEuropean,WestEuropean,Italian','GreaterEuropean,WestEuropean,Nordic']
@@ -43,8 +46,8 @@ yhat=sess.graph.get_tensor_by_name('Softmax:0')
 
 #sess.run(tf.global_variables_initializer())
 def ClassifyName(inname):
-    return le.inverse_transform(np.argmax(sess.run(yhat,feed_dict={x:[ToInt(inname)]})))
+    return le.inverse_transform(np.argmax(sess.run(yhat,feed_dict={x:[ToInt(inname,maxLen=nameLen)]})))
 
 def ClassifyNames(innames):
-    namevecs=[ToInt(tmp) for tmp in innames]
+    namevecs=[ToInt(tmp,maxLen=nameLen) for tmp in innames]
     return le.inverse_transform(np.argmax(sess.run(yhat,feed_dict={x:namevecs}),axis=1))

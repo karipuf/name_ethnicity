@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder,OneHotEncoder
 
 # Utility functions
-def ToInt(instr,maxLen=15):
+def ToInt(instr,maxLen=20):
     basevec=[ord(tmp.lower())-96 for tmp in  re.sub('\s','`',instr)]
     if len(instr)>=maxLen:
         return basevec[:maxLen]
@@ -14,12 +14,13 @@ def ToInt(instr,maxLen=15):
         
 
 # Initializations
-nUnits=1200
+nameLen=20
+nUnits=600
 nEthnicities=13
 lr=.005
 nIters=20000
 nDisp=250
-savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr'
+savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen'
 existingModel=False
 minibatch=128
 valProp=.1
@@ -36,7 +37,7 @@ for fname in fnames:
        eths.append(','.join([tmp2['best'] for tmp2 in tmp[1]]))
 
 
-xnum=np.array([ToInt(tmp) for tmp in names])
+xnum=np.array([ToInt(tmp,maxLen=nameLen) for tmp in names])
 le=LabelEncoder().fit(eths)
 ynum=np.array(le.transform(eths))
 
