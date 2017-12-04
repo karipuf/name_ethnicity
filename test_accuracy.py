@@ -12,7 +12,7 @@ from classify_name import *
 # Parsing input parameters
 if parsed.m==None:
     # The best so far...
-    savePath='good_models/model_800units_0.005lr_20maxNameLen_withsociology'
+    savePath='goodModels/model_800units_0.005lr_20maxNameLen_withsociology'
 else:
     savePath=parsed.m
 
@@ -23,7 +23,6 @@ else:
 
 LoadNetwork(savePath=savePath)
 testSet=pickle.load(open(testFile,'rb'))
-#testSet=pickle.load(open("PsychologyEth.pkl",'rb'))
 
 vec=[]
 for item in testSet.items():

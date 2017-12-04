@@ -6,6 +6,7 @@ ap.add_argument('-n',help='Number of hidden units (default 800)')
 ap.add_argument('-lr',help='Learning rate (default 0.005)')
 ap.add_argument('-d',help='Display output every n iterations (note: for now this is also the interval at which models are evaluated and saved to "currentBest"')
 ap.add_argument('-m',help='Set minibatch size (default 128)')
+ap.add_argument('-i',help='Number of training iterations (default 30000)')
 parsed=ap.parse_args()
 
 import glob
@@ -43,12 +44,17 @@ if parsed.m==None:
     minibatch=128
 else:
     minibatch=int(parsed.m)
+
+if parsed.i==None:
+    nIters=30000
+else:
+    nIters=int(parsed.i)
+
     
 nameLen=20
 nEthnicities=13
-nIters=30000
 fnames=glob.glob('trainingSets/*')
-savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen_'+str(len(fnames))+'trainingfiles_'+str(minibatch)+'minibatch'
+savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen_'+str(len(fnames))+'trainingfiles_'+str(minibatch)+'minibatch_'+str(nIters)+'iterations'
 existingModel=False
 valProp=.1
 

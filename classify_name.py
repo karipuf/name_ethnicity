@@ -15,7 +15,7 @@ def ToInt(instr,maxLen=20):
 
 # Initializations
 nameLen=20
-savePath='currentBest_model_800units_0.005lr_20maxNameLen'
+savePath='goodModels/model_800units_0.005lr_20maxNameLen_withsociology'
 tensors={}
 
 # Creating label encoder for the ethnicities
@@ -70,4 +70,4 @@ def ClassifyNames(innames):
     namevecs=[ToInt(tmp,maxLen=nameLen) for tmp in innames]
     return le.inverse_transform(np.argmax(sess.run(yhat,feed_dict={x:namevecs}),axis=1))
 
-LoadNetwork(savePath='model_800units_0.005lr_20maxNameLen_withsociology');
+LoadNetwork();
