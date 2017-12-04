@@ -15,18 +15,18 @@ def ToInt(instr,maxLen=20):
 
 # Initializations
 nameLen=20
-nUnits=600
+nUnits=800
 nEthnicities=13
 lr=.005
-nIters=20000
+nIters=30000
 nDisp=250
-savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen'
+savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen_withsociology'
 existingModel=False
 minibatch=128
 valProp=.1
 
 # Extracting features
-fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl','PolSciEth.pkl','PhilosophyEth.pkl']
+fnames=['EcologyEth.pkl','PolSciEth.pkl','OceanEth.pkl','imdbeths.pkl','AccountingEth.pkl','LanguageEth.pkl','PolSciEth.pkl','PhilosophyEth.pkl','SociologyEth.pkl']
 
 names=[]
 eths=[]

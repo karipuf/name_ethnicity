@@ -17,7 +17,6 @@ def ToInt(instr,maxLen=20):
 nameLen=20
 
 savePath='currentModel_600units_0.005lr'
-#savePath='currentBest_model_800units_0.005lr'
 savePath='currentBest_model_800units_0.005lr_20maxNameLen'
 
 # Extracting features
