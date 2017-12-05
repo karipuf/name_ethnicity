@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 ap=ArgumentParser()
 ap.add_argument('-m',help='Model file path')
 ap.add_argument('-i',help='Input pickle file to test on')
+ap.add_argument('-v',help='Verbose',nargs='?',default=-1)
 parsed=ap.parse_args()
 
 import pickle
@@ -35,5 +36,7 @@ ypred=ClassifyNames([tmp[0] for tmp in vec[:nTest]])
 ylab=np.array([tmp[1] for tmp in vec[:nTest]])
 acc=len(pl.find(ypred==ylab))/len(vec[:nTest])
 
+if parsed.v==None:
+    print('For model '+savePath+' and test file '+testFile+":")
 print("Accuracy is "+str(100*acc)+"%")
 
