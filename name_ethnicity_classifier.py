@@ -53,7 +53,7 @@ else:
     
 nameLen=20
 nEthnicities=13
-fnames=glob.glob('trainingSets/*')
+fnames=glob.glob('trainingSets/*pkl')
 savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen_'+str(len(fnames))+'trainingfiles_'+str(minibatch)+'minibatch_'+str(nIters)+'iterations'
 existingModel=False
 valProp=.1

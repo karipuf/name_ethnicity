@@ -12,7 +12,7 @@ from glob import glob
 from itertools import chain
 import re,os,sys
 
-models=[re.compile('(.+)\.meta').findall(tmp)[0] for tmp in glob(inGlob)]
+models=[re.compile('(.+)\.meta').findall(tmp)[0] for tmp in glob(inGlob) if 'meta' in tmp]
 
 print("Testing the following models:")
 print('\n'.join(models))
@@ -20,7 +20,8 @@ sys.stdout.flush()
 
 cmds_a=['python test_accuracy.py -v -m '+tmp+' -i testSets/PsychologyEth.pkl 2> /dev/null' for tmp in models]
 cmds_b=['python test_accuracy.py -v -m '+tmp+' 2> /dev/null' for tmp in models]
-cmds=list(chain(*zip(cmds_a,cmds_b)))
+cmds_c=['python test_accuracy.py -v -m '+tmp+' -i testSets/imdbeths.pkl 2> /dev/null' for tmp in models]
+cmds=list(chain(*zip(cmds_a,cmds_b,cmds_c)))
 
 for cmd in cmds:
     os.system(cmd)

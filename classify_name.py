@@ -15,7 +15,7 @@ def ToInt(instr,maxLen=20):
 
 # Initializations
 nameLen=20
-savePath='goodModels/model_800units_0.005lr_20maxNameLen_withsociology'
+savePath='goodModels/model_800units_0.005lr_20maxNameLen_12trainingfiles_192minibatch_35000iterations'
 tensors={}
 
 # Creating label encoder for the ethnicities
