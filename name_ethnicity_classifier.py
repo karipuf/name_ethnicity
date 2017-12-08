@@ -7,6 +7,7 @@ ap.add_argument('-lr',help='Learning rate (default 0.005)')
 ap.add_argument('-d',help='Display output every n iterations (note: for now this is also the interval at which models are evaluated and saved to "currentBest"')
 ap.add_argument('-m',help='Set minibatch size (default 128)')
 ap.add_argument('-i',help='Number of training iterations (default 30000)')
+ap.add_argument('-mnl',help='Maximum length of the name vector (default 20)')
 parsed=ap.parse_args()
 
 import glob
@@ -50,8 +51,12 @@ if parsed.i==None:
 else:
     nIters=int(parsed.i)
 
-    
-nameLen=20
+if parsed.mnl==None:
+    nameLen=20
+else:
+    nameLen=int(parsed.mnl)
+
+
 nEthnicities=13
 fnames=glob.glob('trainingSets/*pkl')
 savePath='model_'+str(nUnits)+'units_'+str(lr)+'lr_'+str(nameLen)+'maxNameLen_'+str(len(fnames))+'trainingfiles_'+str(minibatch)+'minibatch_'+str(nIters)+'iterations'
